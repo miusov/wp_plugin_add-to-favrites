@@ -1,0 +1,13 @@
+p a.favorites-link{
+    text-decoration: none;
+    border: none;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+p a.favorites-link:hover{
+    color: orangered;
+}

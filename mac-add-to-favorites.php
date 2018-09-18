@@ -8,9 +8,8 @@ Author: artem_miusov
 Author URI: https://github.com/miusov
 */
 
+require __DIR__ . '/functions.php';
+
 add_filter('the_content','mac_add_to_favorites');
 
-function mac_add_to_favorites($content){
-    if ( !is_single() || !is_user_logged_in() ) return $content;
-    return '<p><a href="#" class="favorites-link">Add to favorites</a></p>' . $content;
-}
+add_action('wp_enqueue_scripts', 'mac_add_to_favorites_scripts');
