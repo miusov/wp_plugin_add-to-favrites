@@ -11,3 +11,7 @@ p a.favorites-link{
 p a.favorites-link:hover{
     color: orangered;
 }
+
+.mac-preloader{
+    display: none;
+}

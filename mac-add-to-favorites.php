@@ -13,3 +13,5 @@ require __DIR__ . '/functions.php';
 add_filter('the_content','mac_add_to_favorites');
 
 add_action('wp_enqueue_scripts', 'mac_add_to_favorites_scripts');
+
+add_action('wp_ajax_mac_atf','wp_ajax_mac_atf');
