@@ -26,7 +26,14 @@ function mac_add_to_favorites($content)
 {
     if ( !is_single() || !is_user_logged_in() ) return $content;
     $img_src = plugins_url('/assets/img/preloader.gif', __FILE__);
-    return '<p><a href="#" class="favorites-link">Add to favorites</a><span class="mac-preloader"><img src="'. $img_src .'" alt=""></span></p>' . $content;
+
+    global $post;
+    if ( mac_is_favorites($post->ID) )
+    {
+        return '<p><a href="#" class="rm-favorites-link">Remove from favorites</a></p>' . $content;
+    }
+
+    return '<p><a href="#" class="add-favorites-link">Add to favorites</a><span class="mac-preloader"><img src="'. $img_src .'" alt=""></span></p>' . $content;
 }
 
 /**
@@ -38,7 +45,32 @@ function wp_ajax_mac_atf()
     {
         wp_die('Security Error');
     }
-    echo (int) $_POST['post_id'];
-    wp_die();
+    $post_id =  (int) $_POST['post_id'];
+    $user = wp_get_current_user();
+
+    if ( mac_is_favorites($post_id) ) wp_die('Added!');
+
+    if( add_user_meta($user->ID, 'mac_atf', $post_id) )
+    {
+        wp_die('Added');
+    }
+
+    wp_die('Added error');
+}
+
+/**
+ * Проверка на наличие статьи в БД
+ * @param $post_id
+ * @return bool
+ */
+function mac_is_favorites($post_id)
+{
+    $user = wp_get_current_user();
+    $favorites = get_user_meta($user->ID, 'mac_atf');
+    foreach ($favorites as $favorite)
+    {
+        if ($favorite == $post_id) return true;
+    }
+    return false;
 }
 
