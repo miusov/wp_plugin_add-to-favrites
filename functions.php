@@ -7,18 +7,18 @@ function mac_add_to_favorites_scripts()
 {
     if ( !is_single() || !is_user_logged_in() ) return;
 
-//    Подключаю JS скрипты
+//    Подключаем JS скрипты
     wp_enqueue_script('mac_add-to-favorites-js', plugins_url('/assets/js/mac_add-to-favorites.js', __FILE__), array('jquery'), null, false);
-//    Подключаю CSS стили
+//    Подключаем CSS стили
     wp_enqueue_style('mac_add-to-favorites-css', plugins_url('/assets/css/mac_add-to-favorites.css', __FILE__));
-//    Обьявляю глобальный обьект $post
+//    Обьявляем глобальный обьект $post
     global $post;
-//    Добавляю обьект с данными в файл /assets/js/mac_add-to-favorites.js
+//    Добавляем обьект с данными в файл /assets/js/mac_add-to-favorites.js
     wp_localize_script('mac_add-to-favorites-js','mac_obj', ['url'=>admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('mac_nonce'), 'post_id' => $post->ID] );
 }
 
 /**
- * Добавление ссылки Add to favorites перед контентом статьи
+ * Добавление ссылки Add to favorites или Remove from favorites перед контентом статьи
  * @param $content
  * @return string
  */
@@ -28,18 +28,17 @@ function mac_add_to_favorites($content)
     $img_src = plugins_url('/assets/img/preloader.gif', __FILE__);
 
     global $post;
-    if ( mac_is_favorites($post->ID) )
+    if ( mac_is_favorites($post->ID) ) //Проверяем есть ли статья в БД
     {
-        return '<p><a href="#" class="rm-favorites-link">Remove from favorites</a></p>' . $content;
+        return '<p class="favorites-link"><a href="#" data-action="del" class="del-favorites-link">Remove from favorites</a><span class="mac-preloader"><img src="'. $img_src .'" alt=""></span></p>' . $content;
     }
-
-    return '<p><a href="#" class="add-favorites-link">Add to favorites</a><span class="mac-preloader"><img src="'. $img_src .'" alt=""></span></p>' . $content;
+    return '<p class="favorites-link"><a href="#" data-action="add" class="add-favorites-link">Add to favorites</a><span class="mac-preloader"><img src="'. $img_src .'" alt=""></span></p>' . $content;
 }
 
 /**
- * AJAX
+ * Добавление или удаление статей в user_meta
  */
-function wp_ajax_mac_atf()
+function wp_ajax_mac_action()
 {
     if (!wp_verify_nonce($_POST['security'], 'mac_nonce'))
     {
@@ -48,13 +47,22 @@ function wp_ajax_mac_atf()
     $post_id =  (int) $_POST['post_id'];
     $user = wp_get_current_user();
 
-    if ( mac_is_favorites($post_id) ) wp_die('Added!');
-
-    if( add_user_meta($user->ID, 'mac_atf', $post_id) )
+    if ( $_POST['post_action'] == 'add' )
     {
-        wp_die('Added');
+        if ( mac_is_favorites($post_id) ) wp_die('Added!');
+        if( add_user_meta($user->ID, 'mac_atf', $post_id) )
+        {
+            wp_die('Added');
+        }
     }
-
+    if ( $_POST['post_action'] == 'del' )
+    {
+        if ( !mac_is_favorites($post_id) ) wp_die();
+        if( delete_user_meta($user->ID, 'mac_atf', $post_id) )
+        {
+            wp_die('Removed');
+        }
+    }
     wp_die('Added error');
 }
 

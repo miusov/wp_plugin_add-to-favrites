@@ -1,7 +1,7 @@
 jQuery( document ).ready(function( $ ) {
 
-    $(document).on('click','a.favorites-link', function (e) {
-
+    $(document).on('click','p.favorites-link a', function (e) {
+        var action = $(this).data('action');
         $.ajax({
             type:'POST',
             // url:'/wp-admin/admin-ajax.php',
@@ -9,13 +9,14 @@ jQuery( document ).ready(function( $ ) {
             data:{
                 post_id:mac_obj.post_id,
                 security:mac_obj.nonce,
-                action:'mac_atf'
+                post_action: action,
+                action:'mac_action'
             },
             beforeSend:function(){
                 $(".mac-preloader").show();
             },
             success:function (data) {
-                $("p a.favorites-link").html(data);
+                $("p.favorites-link a").html(data);
                 $(".mac-preloader").hide();
             },
             error:function () {
