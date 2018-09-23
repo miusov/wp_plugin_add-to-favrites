@@ -16,7 +16,7 @@ jQuery( document ).ready(function( $ ) {
                 $(".mac-preloader").show();
             },
             success:function (data) {
-                $("p.favorites-link a").html(data);
+                $("p.favorites-link").html(data);
                 $(".mac-preloader").hide();
             },
             error:function () {

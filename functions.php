@@ -82,3 +82,31 @@ function mac_is_favorites($post_id)
     return false;
 }
 
+/**
+ * Добавляем виджет в консоль администратора
+ */
+function mac_favorites_dashboard_widget()
+{
+    wp_add_dashboard_widget('mac_adf_dashboard', 'Favorites List', 'mac_show_dashboard_widget');
+}
+
+/**
+ * Функция для вывода контента виджета
+ */
+function mac_show_dashboard_widget()
+{
+    $user = wp_get_current_user();
+    $favorites = get_user_meta($user->ID, 'mac_atf');
+
+    if (!$favorites)
+    {
+        echo 'List empty';
+        return;
+    }
+    echo '<ul>';
+    foreach ($favorites as $favorite)
+    {
+        echo '<li><a href="'.get_permalink($favorite).'" target="_blank" >' . get_the_title($favorite) . '</li></li>';
+    }
+    echo '</ul>';
+}
